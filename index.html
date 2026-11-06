@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C9VW8D7RSL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  (function () {
+    // ?ref=company → tracked as "visitor_source" so you can see which application link was opened
+    var ref = new URLSearchParams(location.search).get('ref');
+    try {
+      if (ref) sessionStorage.setItem('ref', ref.toLowerCase());
+      ref = sessionStorage.getItem('ref') || ref;
+    } catch (e) {}
+    gtag('config', 'G-C9VW8D7RSL', ref ? { visitor_source: ref } : {});
+    if (ref) gtag('event', 'ref_visit', { visitor_source: ref });
+  })();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meet B. Patel — Product Engineer & Tech Entrepreneur</title>
@@ -734,15 +751,15 @@ footer{
       </div>
     </div>
     <div class="proj-card reveal">
-      <div class="proj-status"><span class="proj-status-dot"></span>Jun 2020 – Dec 2020</div>
-      <h3>Derema Help — B2B Field Sales Tool</h3>
-      <p>Two B2B Android apps for Derema Group (US) enabling field sales reps with offline PDF storage, training video access, push notifications, and projection tool support. Rated 4.6 stars with 1,000+ downloads.</p>
+      <div class="proj-status"><span class="proj-status-dot"></span>Active Development</div>
+      <h3>All I Want — E-commerce Platform</h3>
+      <p>Architected and built a full e-commerce solution with real-time price negotiation between buyers and sellers, an integrated wallet, AI-powered product cataloging, and multi-provider shipping. Leading the real-time chat and payment processing work, and driving AI integration for automated product data extraction. Set up CI/CD with GitHub Actions, improving deployment efficiency by 25%.</p>
       <div class="proj-tags">
-        <span class="proj-tag">Android Kotlin</span><span class="proj-tag">REST APIs</span><span class="proj-tag">Offline Storage</span><span class="proj-tag">Push Notifications</span>
+        <span class="proj-tag">Flutter</span><span class="proj-tag">Real-time Chat</span><span class="proj-tag">Payments</span><span class="proj-tag">Wallet</span><span class="proj-tag">AI Cataloging</span><span class="proj-tag">Shipping APIs</span><span class="proj-tag">GitHub Actions</span>
       </div>
       <div class="proj-footer">
-        <span>USA Client · B2B</span>
-        <span class="proj-result">⭐ 4.6 · 1,000+ Downloads</span>
+        <span>Architect · E-commerce</span>
+        <span class="proj-result">⚡ 25% Faster Deployments</span>
       </div>
     </div>
   </div>
@@ -921,6 +938,33 @@ const obs = new IntersectionObserver((entries) => {
   });
 },{threshold:0.07});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Track clicks on contact / profile links
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href]');
+  if (!a || typeof gtag !== 'function') return;
+  const href = a.getAttribute('href');
+  let type = null;
+  if (href.startsWith('mailto:')) type = 'email';
+  else if (href.startsWith('tel:')) type = 'phone';
+  else if (href.includes('linkedin.com')) type = 'linkedin';
+  else if (href.includes('github.com')) type = 'github';
+  else if (href.includes('apps.apple.com')) type = 'app_store';
+  if (type) gtag('event', 'contact_click', { link_type: type, link_text: a.textContent.trim().slice(0, 60) });
+});
+
+// Track which sections visitors actually reach
+const seen = new Set();
+const secObs = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    const id = e.target.id;
+    if (e.isIntersecting && id && !seen.has(id) && typeof gtag === 'function') {
+      seen.add(id);
+      gtag('event', 'section_view', { section: id });
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('section[id], div[id]').forEach(el => secObs.observe(el));
 </script>
 </body>
 </html>
